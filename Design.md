@@ -1,53 +1,140 @@
 # Gather AI Clone - Project Design
 
-## 1. Core Mechanics: Movement & Navigation
-
-**Grid-Based Movement:** All movement is snapped to a 32x32 pixel grid.
-
-**Controls:** Users navigate using WASD or Arrow Keys.
-
-**Ghost Mode:** By holding the 'G' key, the player becomes a "ghost" (opacity 0.5). In this state, they can pass through other players and ignore collision blocks to prevent getting stuck in crowded areas.
+## Based on Gather.town Features
 
 ---
 
-## 2. Spatial Presence: Proximity Audio & Video
+## 1. Core Features (MVP)
 
-The core feature is the "Walk-up and Talk" mechanic, where media streams are triggered by physical distance between avatars.
+### 1.1 Virtual 2D Workspace
+- 2D top-down map (like Gather.town)
+- Avatar-based presence
+- Real-time multiplayer sync
 
-**Distance Formula:** Proximity is calculated using the Euclidean distance between two avatars:
+### 1.2 Proximity-Based Communication
+- **Walk up and talk** - No meeting links needed
+- Audio/Video activates within 200px radius
+- Muted by default
+- User controls what they hear
 
+### 1.3 Status Indicators
+- **Available** - Green, open for conversation
+- **Busy/Focus** - Red, do not disturb
+- **In Meeting** - Yellow, in a call
+- **Away** - Gray, inactive
+
+### 1.4 Avatar System (MVP - Phase 1)
+Users select a geometric shape and color to represent themselves.
+
+**Shapes:**
+- Circle
+- Square
+- Triangle
+- Diamond
+- Hexagon
+
+**Colors:**
+- Predefined palette of 12 colors
+- Hex values stored in database
+
+**Future (Phase 2):**
+- Full RPG character customization
+- Hair styles, glasses, hats
+- Shirts, pants, shoes
+- Multiple skin tones
+
+---
+
+## 2. Core Mechanics: Movement & Navigation
+
+**Grid-Based Movement:** 32x32 pixel grid.
+
+**Controls:** WASD or Arrow Keys.
+
+**Ghost Mode:** Hold 'G' to pass through collisions (opacity 0.5).
+
+---
+
+## 3. Spatial Presence: Proximity Audio & Video
+
+**Distance Formula:**
 $$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$
 
-**Activation Threshold:** Audio and video streams must automatically initialize when the distance $d$ is less than 200 pixels.
+**Activation:** Distance < 200px triggers A/V.
 
-**Audio Attenuation:** Volume must drop off gradually as distance increases. Use a Logarithmic or Inverse fall-off model to simulate realistic sound propagation.
+**Audio Attenuation:** Volume drops with distance (logarithmic).
 
-**Stereo Panning:** Utilize the PannerNode from the Web Audio API to pan audio to the left or right speaker based on the relative X-position of the speaker to the listener.
-
----
-
-## 3. Specialized Map Zones
-
-**Private Areas:** Specific tiles marked with a private_id in the map JSON. When a user enters a private zone, they are connected to everyone else in that same zone regardless of distance, while audio from users outside the zone is muted.
-
-**Quiet Zones:** Areas where the activation radius is significantly reduced to allow for focused work.
+**Stereo Panning:** PannerNode based on relative X position.
 
 ---
 
-## 4. Interactive Objects
+## 4. Specialized Map Zones
 
-**Trigger Key:** Users press 'X' to interact with highlighted objects.
+### Private Areas
+- Tiles with private_id
+- Audio unlimited within zone
+- Muted outside zone
 
-**Object Types:**
-
-- **Iframe Objects:** Open a website or shared document (e.g., Google Docs, Miro) in a modal.
-- **Video Objects:** Play a synchronized YouTube or Twitch stream.
-- **External Links:** Direct users to external resources.
+### Quiet Zones
+- Reduced activation radius
+- Focused work areas
 
 ---
 
-## 5. Visual Feedback & UI
+## 5. Interactive Objects
 
-**Talking Indicators:** Display a colored aura or a "speech bubble" icon over an avatar whenever their microphone detects active speech.
+**Trigger:** Press 'X' to interact.
 
-**Connection Status:** Visual cues (like a spinning loader) should appear in the corner of the screen when a WebRTC connection is being established with a nearby neighbor.
+**Types:**
+- **Iframe** - Google Docs, Miro, etc.
+- **Video** - YouTube/Twitch streams
+- **External Links** - URLs
+
+---
+
+## 6. UI Components
+
+### Chat Overlay
+- Text chat in workspace
+- @mentions
+- Emoji support
+
+### Video Calls
+- Click to start video
+- Screen sharing
+- Meeting rooms
+
+### Mini Mode
+- Small floating window
+- Stay connected while using other apps
+
+### Simplified View
+- Focus on people, not details
+- Reduced visual noise
+
+---
+
+## 7. Visual Feedback
+
+- **Talking indicator** - Aura or speech bubble when mic active
+- **Connection loader** - Spinning when connecting
+- **Proximity highlight** - Players within range highlighted
+
+---
+
+## 8. User Controls
+
+- Mute/unmute self
+- Set status (available, busy, away)
+- Control who can approach
+- Volume slider per user
+
+---
+
+## 9. Tech Stack
+
+- **Frontend:** Phaser 3
+- **Backend:** Node.js + Socket.io
+- **DB:** Supabase
+- **Media:** LiveKit (WebRTC)
+- **Auth:** Supabase Auth

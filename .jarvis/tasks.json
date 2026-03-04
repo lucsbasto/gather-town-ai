@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-03-04T02:40:00Z",
+  "lastUpdated": "2026-03-04T03:35:00Z",
   "tasks": [
     {
       "id": "GT-001",
@@ -57,6 +57,48 @@
       "status": "backlog",
       "execution_role": "REVIEWER",
       "description": "Review database schema and RLS policies"
+    },
+    {
+      "id": "GT-UI-001",
+      "title": "Refactor game UI with design tokens",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Apply interface-design skill tokens"
+    },
+    {
+      "id": "GT-UI-002",
+      "title": "Create PlayerAvatar component",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Reusable avatar component"
+    },
+    {
+      "id": "GT-UI-003",
+      "title": "Create ProximityIndicator component",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Visual feedback for nearby players"
+    },
+    {
+      "id": "GT-UI-004",
+      "title": "Create ChatOverlay component",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Text chat overlay"
+    },
+    {
+      "id": "GT-UI-005",
+      "title": "Create StatusIndicator component",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "User status display"
+    },
+    {
+      "id": "GT-UI-006",
+      "title": "Create ControlPanel component",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Mute/unmute, settings"
     }
   ]
 }

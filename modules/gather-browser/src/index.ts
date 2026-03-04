@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { io, Socket } from 'socket.io-client';
 import { LiveKitService, liveKitService } from './livekit';
+import { tokens } from './components/designTokens';
 
 // Supabase configuration - use env variables via Vite
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'http://127.0.0.1:54321';
@@ -66,7 +67,7 @@ let socket: Socket;
 let currentPlayer: Player | null = null;
 let players = new Map<string, Player>();
 let cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-let wasd: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key; S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key; G: Phaser.Input.Keyboard.Key };
+let wasd: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key; S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key; G: Phaser.Input.Keyboard.Key; M: Phaser.Input.Keyboard.Key };
 let ghostMode = false;
 let authState: AuthState;
 let authToken: string | null = null; // Store JWT token for socket auth
@@ -76,6 +77,14 @@ let proximityPlayers = new Map<string, ProximityInfo>();
 let pendingMoves: { x: number; y: number }[] = [];
 let lastMoveTime = 0;
 const MOVE_COOLDOWN = 100; // ms
+
+// Audio state
+let isMuted = true; // Muted by default (Gather.town style)
+let isMicEnabled = false;
+let audioStatusText: Phaser.GameObjects.Text;
+
+// Proximity indicator UI element
+let proximityIndicatorText: Phaser.GameObjects.Text;
 
 // Auth functions
 async function initAuth(): Promise<AuthState> {
@@ -194,7 +203,98 @@ function initSocket() {
     proximityPlayers.clear();
     data.forEach(p => proximityPlayers.set(p.playerId, p));
     updateProximityVisuals();
+    updateLiveKitConnections(data);
   });
+}
+
+// Update LiveKit connections based on proximity
+let liveKitConnected = false;
+let nearbyParticipants = new Set<string>();
+
+async function updateLiveKitConnections(proximityData: ProximityInfo[]) {
+  // Only connect if we have a user and room
+  if (!authState.user || !currentRoomId) return;
+  
+  const newNearby = new Set<string>();
+  let hasNewNearby = false;
+  
+  // Check which players are now in range
+  for (const p of proximityData) {
+    if (p.distance < PROXIMITY_THRESHOLD) {
+      newNearby.add(p.playerId);
+      if (!nearbyParticipants.has(p.playerId)) {
+        hasNewNearby = true;
+      }
+    }
+  }
+  
+  // Check if anyone left proximity
+  for (const old of nearbyParticipants) {
+    if (!newNearby.has(old)) {
+      // Player left proximity - could disconnect their audio here
+      console.log('Player left proximity:', old);
+    }
+  }
+  
+  // Connect to LiveKit if there are nearby players and not yet connected
+  if (newNearby.size > 0 && !liveKitConnected) {
+    try {
+      await connectToLiveKit();
+    } catch (err) {
+      console.error('Failed to connect to LiveKit:', err);
+    }
+  }
+  
+  // Update spatial audio positions for nearby players
+  if (liveKitConnected && currentPlayer) {
+    for (const p of proximityData) {
+      if (p.distance < PROXIMITY_THRESHOLD) {
+        liveKitService.setSpatialPosition(p.playerId, currentPlayer.x, currentPlayer.y, p.x, p.y);
+      }
+    }
+  }
+  
+  nearbyParticipants = newNearby;
+}
+
+async function connectToLiveKit() {
+  if (liveKitConnected || !currentRoomId || !authState.user) return;
+  
+  try {
+    // Get LiveKit token from server
+    const response = await fetch(`${SOCKET_URL}/api/livekit/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        roomName: `room-${currentRoomId}`,
+        participantName: authState.user.id,
+        userId: authState.user.id
+      })
+    });
+    
+    if (!response.ok) {
+      const err = await response.json();
+      if (err.error === 'LiveKit not configured') {
+        console.log('LiveKit not configured, skipping audio');
+        return;
+      }
+      throw new Error(err.error || 'Failed to get token');
+    }
+    
+    const { token, url } = await response.json();
+    
+    // Connect to LiveKit (without enabling audio - muted by default)
+    await liveKitService.connect({ url, token });
+    
+    // Don't enable audio yet - user must unmute first (Gather.town style)
+    // isMuted = true by default
+    
+    liveKitConnected = true;
+    console.log('Connected to LiveKit (muted by default)');
+  } catch (err) {
+    console.error('LiveKit connection failed:', err);
+    liveKitConnected = false;
+  }
 }
 
 function joinRoom() {
@@ -252,7 +352,8 @@ function create() {
     A: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
     S: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
     D: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-    G: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G)
+    G: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G),
+    M: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M)
   };
 
   // Create current player sprite
@@ -296,6 +397,18 @@ function create() {
   this.add.text(10, 50, `Room: ${currentRoomId}`, {
     fontSize: '12px',
     color: '#aaaaaa'
+  });
+  
+  // Proximity indicator UI
+  proximityIndicatorText = this.add.text(10, 70, 'Nearby: 0 players', {
+    fontSize: '12px',
+    color: '#ffff00'
+  });
+  
+  // Audio status UI
+  audioStatusText = this.add.text(10, 90, '🎤 Muted (Press M to unmute)', {
+    fontSize: '12px',
+    color: '#ff6666'
   });
 }
 
@@ -374,6 +487,10 @@ function update() {
   if (Math.random() < 0.05) { // ~3 times per second at 60fps
     requestProximity();
   }
+  
+  // Client-side proximity check using Euclidean distance
+  // Formula: d = sqrt((x2 - x1)^2 + (y2 - y1)^2)
+  checkProximityLocally();
 }
 
 // Collision detection
@@ -386,6 +503,60 @@ function isColliding(x: number, y: number): boolean {
   }
   
   return collisionLayer[gridY]?.[gridX] === 1;
+}
+
+// Calculate Euclidean distance between two points
+function euclideanDistance(x1: number, y1: number, x2: number, y2: number): number {
+  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+// Client-side proximity check using Euclidean distance formula
+// Formula: d = sqrt((x2 - x1)^2 + (y2 - y1)^2)
+function checkProximityLocally(): void {
+  if (!currentPlayer) return;
+  
+  let nearbyCount = 0;
+  const nearbyList: string[] = [];
+  
+  players.forEach((player) => {
+    if (player.isLocal) return;
+    
+    // Use Euclidean distance formula: d = sqrt((x2 - x1)^2 + (y2 - y1)^2)
+    const distance = euclideanDistance(
+      currentPlayer!.x, 
+      currentPlayer!.y, 
+      player.x, 
+      player.y
+    );
+    
+    // Update proximityPlayers with local calculation
+    proximityPlayers.set(player.id, {
+      playerId: player.id,
+      distance,
+      x: player.x,
+      y: player.y
+    });
+    
+    // Count players within 200px
+    if (distance < PROXIMITY_THRESHOLD) {
+      nearbyCount++;
+      nearbyList.push(`${player.id.slice(0, 6)} (${Math.round(distance)}px)`);
+    }
+  });
+  
+  // Update proximity indicator UI
+  if (proximityIndicatorText) {
+    if (nearbyCount > 0) {
+      proximityIndicatorText.setText(`Nearby: ${nearbyCount} player${nearbyCount > 1 ? 's' : ''}`);
+      proximityIndicatorText.setColor('#00ff00'); // Green when players are near
+    } else {
+      proximityIndicatorText.setText('Nearby: 0 players');
+      proximityIndicatorText.setColor('#ffff00'); // Yellow when alone
+    }
+  }
+  
+  // Update visual highlights for nearby players
+  updateProximityVisuals();
 }
 
 function drawCollisionLayer() {

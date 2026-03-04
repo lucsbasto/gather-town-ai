@@ -30,9 +30,21 @@ Before any PR is approved, the following must be verified:
 
 - [ ] **Build:** The project must build successfully (`yarn build`).
 - [ ] **Lint:** No linting or TypeScript errors.
-- [ ] **Tests:** All automated tests must pass.
+- [ ] **Tests:** All automated tests must pass. **REQUIRED - PR will be blocked if tests fail.**
 - [ ] **Documentation:** New mechanics must be documented in Design.md.
 - [ ] **Small Scope:** PRs should be surgical. Avoid refactoring unrelated code in a feature PR.
+
+---
+
+## CI/CD - Tests Must Pass Before Merge
+
+All PRs require passing tests. The workflow runs:
+1. `yarn install`
+2. `yarn build`
+3. `yarn test` (unit tests)
+4. `yarn test:e2e` (E2E tests - when implemented)
+
+**Blocker:** If tests fail, fix the functionality BEFORE opening PR.
 
 ---
 
@@ -45,15 +57,36 @@ To maintain high reliability, the project follows a tiered testing approach:
 - **RLS Policies:** Every table must have Row Level Security (RLS) enabled.
 - **pgTAP Tests:** Use supabase test db to verify RLS policies and database functions in `./supabase/tests/`.
 
-### 4.2. Game Logic (Unit Testing)
+### 4.2. Game Logic (Unit Testing) - REQUIRED
 
-- **Pure Functions:** Use Vitest to test decoupled logic (e.g., Euclidean distance calculations, collision math, state reducers).
-- **No Mocking Overload:** Only unit test logic that can be run outside of the browser context to prevent slow/brittle tests.
+- **Vitest:** All new features must include unit tests.
+- **Coverage:** Aim for 80% coverage on new code.
+- **Pure Functions:** Test distance calculations, collision logic, state reducers.
 
-### 4.3. Real-time & Multiplayer
+### 4.3. Real-time & Multiplayer - REQUIRED
 
-- **Socket Events:** Test Socket.io emitters and listeners to ensure the Authoritative Server model is respected.
-- **Happy Paths:** Use Vitest Browser Mode or Playwright to test critical user flows (e.g., "User joins room and sees other players").
+- **Socket Events:** Test Socket.io emitters and listeners.
+- **Playwright:** E2E tests for critical flows.
+
+### 4.4. Test Files Location
+
+```
+modules/
+├── gather-browser/
+│   └── src/
+│       └── __tests__/      # Vitest tests
+└── gather-dev-server/
+    └── src/
+        └── __tests__/      # Vitest tests
+```
+
+### 4.5. Running Tests
+
+```bash
+yarn test              # Unit tests
+yarn test:e2e         # E2E tests
+yarn test:coverage    # Coverage report
+```
 
 ---
 
