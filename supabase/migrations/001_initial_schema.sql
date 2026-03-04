@@ -1,3 +1,17 @@
+-- Create map_data table (must be created first since rooms references it)
+CREATE TABLE map_data (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  tileset_json JSONB,
+  collision_layer JSONB,
+  width INTEGER DEFAULT 25,
+  height INTEGER DEFAULT 19,
+  tile_size INTEGER DEFAULT 32,
+  properties JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Create rooms table
 CREATE TABLE rooms (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -22,20 +36,6 @@ CREATE TABLE players (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, room_id)
-);
-
--- Create map_data table
-CREATE TABLE map_data (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  tileset_json JSONB,
-  collision_layer JSONB,
-  width INTEGER DEFAULT 25,
-  height INTEGER DEFAULT 19,
-  tile_size INTEGER DEFAULT 32,
-  properties JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Enable Row Level Security
@@ -66,9 +66,6 @@ CREATE INDEX idx_players_room_id ON players(room_id);
 CREATE INDEX idx_players_user_id ON players(user_id);
 CREATE INDEX idx_rooms_owner_id ON rooms(owner_id);
 CREATE INDEX idx_rooms_is_public ON rooms(is_public) WHERE is_public = true;
-
--- Add foreign key from rooms to map_data
-ALTER TABLE rooms ADD CONSTRAINT rooms_map_id_fkey FOREIGN KEY (map_id) REFERENCES map_data(id);
 
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()

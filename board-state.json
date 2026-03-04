@@ -1,0 +1,262 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-03-04T02:45:00Z",
+  "tasks": [
+    {
+      "id": "SUPABASE-SCHEMA-001",
+      "title": "Define Supabase database schema for rooms, players, and map_data",
+      "description": "Create PostgreSQL schema with tables for rooms (id, name, owner_id, created_at), players (id, user_id, room_id, x, y, avatar_url, status), and map_data (id, room_id, tileset_json, collision_layer, properties). Include RLS policies.",
+      "execution_role": "DATA_ENGINEER",
+      "status": "done",
+      "priority": "high",
+      "dependencies": [],
+      "acceptance_criteria": [
+        "Tables created: rooms, players, map_data",
+        "RLS policies enabled on all tables",
+        "Foreign key relationships properly defined",
+        "Schema supports room creation and player joining"
+      ],
+      "tags": ["supabase", "database", "schema"]
+    },
+    {
+      "id": "AUTH-001",
+      "title": "Implement Supabase Auth integration",
+      "description": "Set up Supabase Auth for user authentication (email, magic links). Configure auth state management in the frontend and protect routes.",
+      "execution_role": "EXECUTOR",
+      "status": "done",
+      "priority": "high",
+      "dependencies": ["SUPABASE-SCHEMA-001"],
+      "acceptance_criteria": [
+        "Users can sign up and sign in",
+        "Auth state persisted across sessions",
+        "Protected routes redirect to login",
+        "User profile created on first login"
+      ],
+      "tags": ["auth", "supabase", "frontend"]
+    },
+    {
+      "id": "REALTIME-SYNC-001",
+      "title": "Set up Supabase Realtime for player position sync",
+      "description": "Configure Supabase Realtime (broadcast/presence) for low-latency player position synchronization. Use Socket.io on backend for authoritative movement handling.",
+      "execution_role": "ARCHITECT",
+      "status": "done",
+      "priority": "high",
+      "dependencies": ["SUPABASE-SCHEMA-001"],
+      "acceptance_criteria": [
+        "Player positions broadcast to all room participants",
+        "Latency under 100ms for movement updates",
+        "Presence system tracks online/offline status",
+        "Graceful reconnection handling"
+      ],
+      "tags": ["realtime", "supabase", "socket.io", "sync"]
+    },
+    {
+      "id": "REALTIME-SYNC-002",
+      "title": "Implement authoritative server movement validation",
+      "description": "Create Socket.io server that validates player movement against collision layer from Tiled JSON map. Broadcast validated state every 100ms.",
+      "execution_role": "EXECUTOR",
+      "status": "done",
+      "priority": "high",
+      "dependencies": ["REALTIME-SYNC-001"],
+      "acceptance_criteria": [
+        "Server validates movement against collision layer",
+        "Invalid movements rejected and corrected",
+        "State broadcasted to all clients at 10Hz",
+        "Client-side interpolation for smooth visuals"
+      ],
+      "tags": ["backend", "socket.io", "movement", "validation"]
+    },
+    {
+      "id": "MOVEMENT-001",
+      "title": "Implement Phaser 3 grid-based movement system",
+      "description": "Build 32x32 pixel grid movement with WASD/Arrow key controls. Add ghost mode (G key) for passing through players and collisions.",
+      "execution_role": "EXECUTOR",
+      "status": "done",
+      "priority": "high",
+      "dependencies": [],
+      "acceptance_criteria": [
+        "Movement snaps to 32x32 grid",
+        "WASD and Arrow keys work",
+        "Ghost mode reduces opacity to 0.5",
+        "Ghost mode allows passing through collisions"
+      ],
+      "tags": ["phaser", "frontend", "movement"]
+    },
+    {
+      "id": "MOVEMENT-002",
+      "title": "Add collision detection against map tiles",
+      "description": "Implement collision detection using Tiled JSON map collision layer. Prevent player movement into blocked tiles.",
+      "execution_role": "EXECUTOR",
+      "status": "done",
+      "priority": "high",
+      "dependencies": ["MOVEMENT-001", "SUPABASE-SCHEMA-001"],
+      "acceptance_criteria": [
+        "Players cannot walk through collision tiles",
+        "Collision layer loaded from map JSON",
+        "Server validates collisions server-side",
+        "Smooth movement with collision response"
+      ],
+      "tags": ["phaser", "collision", "tiled"]
+    },
+    {
+      "id": "PROXIMITY-001",
+      "title": "Implement proximity detection for audio/video activation",
+      "description": "Calculate Euclidean distance between avatars. Trigger LiveKit audio/video streams when distance < 200px.",
+      "execution_role": "EXECUTOR",
+      "status": "done",
+      "priority": "high",
+      "dependencies": ["REALTIME-SYNC-001"],
+      "acceptance_criteria": [
+        "Distance calculated using Euclidean formula",
+        "Audio/video activates at d < 200px",
+        "Audio/video deactivates beyond threshold",
+        "Efficient proximity check every frame"
+      ],
+      "tags": ["proximity", "audio", "video", "livekit"]
+    },
+    {
+      "id": "PROXIMITY-002",
+      "title": "Implement spatial audio with attenuation and stereo panning",
+      "description": "Use Web Audio API PannerNode for spatial audio. Implement logarithmic volume attenuation and stereo panning based on relative X position.",
+      "execution_role": "EXECUTOR",
+      "status": "backlog",
+      "priority": "medium",
+      "dependencies": ["PROXIMITY-001"],
+      "acceptance_criteria": [
+        "Volume decreases with distance (logarithmic)",
+        "Audio pans left/right based on X position",
+        "Smooth audio transitions",
+        "Works with multiple nearby players"
+      ],
+      "tags": ["audio", "spatial", "web-audio-api"]
+    },
+    {
+      "id": "PROXIMITY-003",
+      "title": "Implement private zones and quiet zones",
+      "description": "Add support for special map zones: private zones (same private_id can hear regardless of distance) and quiet zones (reduced activation radius).",
+      "execution_role": "EXECUTOR",
+      "status": "backlog",
+      "priority": "medium",
+      "dependencies": ["PROXIMITY-001"],
+      "acceptance_criteria": [
+        "Private zones connect users regardless of distance",
+        "Audio from outside private zone is muted",
+        "Quiet zones have reduced activation radius",
+        "Zones defined in Tiled map properties"
+      ],
+      "tags": ["zones", "spatial", "map"]
+    },
+    {
+      "id": "LIVEKIT-001",
+      "title": "Integrate LiveKit for audio/video streaming",
+      "description": "Set up LiveKit room management. Connect spatial audio/video tracks to players within proximity radius.",
+      "execution_role": "EXECUTOR",
+      "status": "done",
+      "priority": "high",
+      "dependencies": ["PROXIMITY-001"],
+      "acceptance_criteria": [
+        "LiveKit room created per game room",
+        "Tracks subscribed only for players within 200px",
+        "Audio/video streams initialize on proximity",
+        "Clean up tracks when players leave"
+      ],
+      "tags": ["livekit", "audio", "video", "webrtc"]
+    },
+    {
+      "id": "MAP-001",
+      "title": "Create map loading and rendering system",
+      "description": "Build Phaser scene that loads Tiled JSON maps. Render tilesets and collision layers. Support map properties for zones.",
+      "execution_role": "EXECUTOR",
+      "status": "done",
+      "priority": "high",
+      "dependencies": [],
+      "acceptance_criteria": [
+        "Tiled JSON maps load correctly",
+        "Tilesets render with proper sprites",
+        "Collision layer accessible for validation",
+        "Map properties parsed for zones"
+      ],
+      "tags": ["phaser", "map", "tiled"]
+    },
+    {
+      "id": "MAP-002",
+      "title": "Store and retrieve map data from Supabase",
+      "description": "Save map configurations to Supabase. Allow rooms to have different maps. Load map data on room join.",
+      "execution_role": "DATA_ENGINEER",
+      "status": "backlog",
+      "priority": "medium",
+      "dependencies": ["SUPABASE-SCHEMA-001", "MAP-001"],
+      "acceptance_criteria": [
+        "Maps stored in map_data table",
+        "Rooms reference map_data via foreign key",
+        "Map JSON retrievable on room join",
+        "Multiple maps supported per instance"
+      ],
+      "tags": ["supabase", "map", "database"]
+    },
+    {
+      "id": "INTERACTIVE-001",
+      "title": "Implement interactive objects (iframe, video, links)",
+      "description": "Add support for interactive objects: iframe objects (websites/docs), video objects (YouTube/Twitch), external links. Trigger with X key.",
+      "execution_role": "EXECUTOR",
+      "status": "backlog",
+      "priority": "medium",
+      "dependencies": ["MOVEMENT-002"],
+      "acceptance_criteria": [
+        "Objects highlight when player is near",
+        "X key opens interaction modal",
+        "Iframe objects embed external websites",
+        "Video objects play synchronized streams"
+      ],
+      "tags": ["interactive", "objects", "ui"]
+    },
+    {
+      "id": "UI-001",
+      "title": "Add visual feedback and UI elements",
+      "description": "Implement talking indicators (aura/speech bubble), connection status loader, and basic HUD elements.",
+      "execution_role": "EXECUTOR",
+      "status": "backlog",
+      "priority": "low",
+      "dependencies": ["LIVEKIT-001"],
+      "acceptance_criteria": [
+        "Talking indicator shows when mic detects speech",
+        "Connection status loader during WebRTC setup",
+        "Basic HUD with room name and user info",
+        "Visual distinction for different player states"
+      ],
+      "tags": ["ui", "visual", "feedback"]
+    },
+    {
+      "id": "REVIEW-001",
+      "title": "Review Supabase schema design",
+      "description": "Review database schema for rooms, players, and map_data. Ensure proper indexing, RLS policies, and performance.",
+      "execution_role": "REVIEWER",
+      "status": "backlog",
+      "priority": "high",
+      "dependencies": ["SUPABASE-SCHEMA-001"],
+      "acceptance_criteria": [
+        "Proper indexes on frequently queried columns",
+        "RLS policies tested and secure",
+        "Schema supports scalability to 20+ users",
+        "No circular dependencies or design flaws"
+      ],
+      "tags": ["review", "database", "supabase"]
+    },
+    {
+      "id": "REVIEW-002",
+      "title": "Review real-time sync implementation",
+      "description": "Review Socket.io and Supabase Realtime implementation for latency, reliability, and edge cases.",
+      "execution_role": "REVIEWER",
+      "status": "backlog",
+      "priority": "high",
+      "dependencies": ["REALTIME-SYNC-001", "REALTIME-SYNC-002"],
+      "acceptance_criteria": [
+        "Latency meets <100ms requirement",
+        "Reconnection handled gracefully",
+        "No race conditions in position updates",
+        "Security against movement cheating"
+      ],
+      "tags": ["review", "realtime", "networking"]
+    }
+  ]
+}
