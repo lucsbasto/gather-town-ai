@@ -43,6 +43,9 @@ Run: `git status` and review every file.
 ### Step 2: Use Skills
 Before implementing anything, search for relevant skills:
 - Check awesome-claude-skills and antigravity-awesome-skills repos
+- Use **create-pr** for creating pull requests
+- Use **git-pr-workflows-git-workflow** for PR workflow
+- Use **comprehensive-review-pr-enhance** for PR descriptions
 - Use interface-design for UI
 - Use test-driven-development for tests
 - Use supabase for database
