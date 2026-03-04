@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "livekit-client": "^2.0.0",
     "phaser": "^3.70.0",
+    "socket.io-client": "^4.6.0",
     "supabase": "^2.0.0"
   },
   "devDependencies": {

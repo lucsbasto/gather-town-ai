@@ -1,0 +1,169 @@
+{
+  "tasks": [
+    {
+      "id": "GT-001",
+      "title": "Set up Supabase project & migrations",
+      "description": "Create Supabase project, configure database schema with tables for users, rooms, player_positions. Run initial migrations for MVP.",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "priority": "high",
+      "acceptance_criteria": [
+        "Supabase project created and accessible",
+        "Database migrations applied successfully",
+        "Tables: users, rooms, player_positions exist",
+        "Realtime enabled on player_positions table",
+        "Environment variables configured in .env"
+      ]
+    },
+    {
+      "id": "GT-002",
+      "title": "Implement Auth integration",
+      "description": "Integrate Supabase Auth for user authentication. Support email/magic links for MVP.",
+      "status": "done",
+      "execution_role": "EXECUTOR",
+      "priority": "high",
+      "acceptance_criteria": [
+        "Users can sign up and log in",
+        "Auth state persisted across sessions",
+        "User profile created in database on first login",
+        "Protected routes require authentication"
+      ]
+    },
+    {
+      "id": "GT-003",
+      "title": "Set up Socket.io server",
+      "description": "Create Node.js server with Socket.io for real-time player position synchronization using authoritative server model.",
+      "status": "done",
+      "execution_role": "EXECUTOR",
+      "priority": "high",
+      "acceptance_criteria": [
+        "Users can sign up and log in",
+        "Auth state persisted across sessions",
+        "User profile created in database on first login",
+        "Protected routes require authentication"
+      ]
+    },
+    {
+      "id": "GT-003",
+      "title": "Set up Socket.io server",
+      "description": "Create Node.js server with Socket.io for real-time player position synchronization using authoritative server model.",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "priority": "high",
+      "acceptance_criteria": [
+        "Socket.io server running on configured port",
+        "Client can connect and receive world state",
+        "Player movement intents validated server-side",
+        "World state broadcast to all clients every 100ms"
+      ]
+    },
+    {
+      "id": "GT-004",
+      "title": "Implement player movement sync",
+      "description": "Phaser 3 player movement with WASD/Arrow keys, grid-snapped (32x32), synced to server and broadcast to all clients.",
+      "status": "done",
+      "execution_role": "EXECUTOR",
+      "priority": "high",
+      "acceptance_criteria": [
+        "Player moves with WASD/Arrow keys",
+        "Movement snapped to 32x32 grid",
+        "Position synced to server in real-time",
+        "Other players visible and smoothly interpolated",
+        "Ghost mode (G key) working with 0.5 opacity"
+      ]
+    },
+    {
+      "id": "GT-005",
+      "title": "Add proximity detection",
+      "description": "Implement Euclidean distance calculation for triggering proximity events when players are within 200px.",
+      "status": "done",
+      "execution_role": "EXECUTOR",
+      "priority": "high",
+      "acceptance_criteria": [
+        "Distance calculated using Euclidean formula",
+        "Proximity threshold set to 200 pixels",
+        "Events triggered when entering/leaving proximity",
+        "Handles multiple nearby players efficiently"
+      ]
+    },
+    {
+      "id": "GT-006",
+      "title": "Integrate LiveKit for spatial audio",
+      "description": "Connect LiveKit for spatial audio/video. Players within 200px radius get audio streams with logarithmic attenuation and stereo panning.",
+      "status": "in_progress",
+      "execution_role": "EXECUTOR",
+      "priority": "high",
+      "acceptance_criteria": [
+        "Player moves with WASD/Arrow keys",
+        "Movement snapped to 32x32 grid",
+        "Position synced to server in real-time",
+        "Other players visible and smoothly interpolated",
+        "Ghost mode (G key) working with 0.5 opacity"
+      ]
+    },
+    {
+      "id": "GT-005",
+      "title": "Add proximity detection",
+      "description": "Implement Euclidean distance calculation for triggering proximity events when players are within 200px.",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "priority": "high",
+      "acceptance_criteria": [
+        "Distance calculated using Euclidean formula",
+        "Proximity threshold set to 200 pixels",
+        "Events triggered when entering/leaving proximity",
+        "Handles multiple nearby players efficiently"
+      ]
+    },
+    {
+      "id": "GT-006",
+      "title": "Integrate LiveKit for spatial audio",
+      "description": "Connect LiveKit for spatial audio/video. Players within 200px radius get audio streams with logarithmic attenuation and stereo panning.",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "priority": "high",
+      "acceptance_criteria": [
+        "LiveKit room created for each game room",
+        "Audio/video connects when d < 200px",
+        "Volume attenuates logarithmically with distance",
+        "Stereo panning based on relative X position",
+        "Media tracks cleaned up when leaving proximity"
+      ]
+    },
+    {
+      "id": "GT-007",
+      "title": "Create map collision system",
+      "description": "Implement collision detection using Tiled JSON map layers. Validate player movements against collision layer.",
+      "status": "backlog",
+      "execution_role": "DATA_ENGINEER",
+      "priority": "high",
+      "acceptance_criteria": [
+        "Tiled JSON map loaded in Phaser",
+        "Collision layer properly configured",
+        "Player cannot walk through solid tiles",
+        "Ghost mode bypasses collisions",
+        "Private/Quiet zone properties parsed correctly"
+      ]
+    },
+    {
+      "id": "GT-008",
+      "title": "Review Supabase schema",
+      "description": "Review database schema design for efficiency, proper indexing, and future scalability. Check realtime configuration.",
+      "status": "backlog",
+      "execution_role": "REVIEWER",
+      "priority": "medium",
+      "acceptance_criteria": [
+        "Schema supports MVP requirements",
+        "Proper indexes on frequently queried columns",
+        "Realtime subscriptions optimized",
+        "No security vulnerabilities in RLS policies",
+        "Documentation updated with schema reference"
+      ]
+    }
+  ],
+  "metadata": {
+    "project": "gather-town-ai",
+    "created": "2026-03-03T22:53:00Z",
+    "version": "1.0.0"
+  }
+}
