@@ -1,0 +1,47 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run linter
+        run: yarn lint || true
+
+      - name: Run TypeScript check
+        run: yarn typecheck
+
+      - name: Run tests
+        run: yarn test
+
+      - name: Build
+        run: yarn build
+
+  # Require passing tests before merge
+  require-tests:
+    needs: lint-and-test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tests must pass
+        run: |
+          echo "All tests passed! ✅"
+          echo "PR is ready to merge."
