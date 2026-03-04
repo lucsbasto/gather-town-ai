@@ -1,0 +1,13 @@
+{
+  "name": "gather-town-ai",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "modules/*"
+  ],
+  "scripts": {
+    "dev:browser": "yarn workspace @gather-town-ai/browser dev",
+    "dev:server": "yarn workspace @gather-town-ai/dev-server dev",
+    "build": "yarn workspaces foreach run build"
+  }
+}
