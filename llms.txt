@@ -1,0 +1,71 @@
+# Gather AI Clone - Technical Context for LLMs
+
+## 1. Core Documentation Reference
+
+- Phaser 3 Docs: https://docs.phaser.io/
+- Phaser 3 Examples: https://labs.phaser.io/
+- Socket.io v4 Docs: https://socket.io/docs/v4/
+- Supabase Docs: https://supabase.com/docs
+- LiveKit Web SDK: https://docs.livekit.io/reference/client/js/
+- Vitest Guide: https://vitest.dev/guide/
+
+---
+
+## 2. Spatial Logic & Formulas
+
+**Distance Calculation:** Use Euclidean distance for proximity checks.
+
+```
+d = sqrt((x2 - x1)^2 + (y2 - y1)^2)
+```
+
+**Audio Attenuation:** Use a Logarithmic distance model via Web Audio API PannerNode.
+
+```
+volume = max(0, 1 - (distance / maxRadius))
+```
+
+**Grid System:** 32x32 pixel tiles. Sprites must snap to grid or use lerp for smooth transition between grid points.
+
+---
+
+## 3. Authoritative Networking Pattern
+
+1. **Input:** Client emits 'move' event with intent coordinates
+2. **Processing:** Node.js server validates coordinates against Tiled JSON collision layer
+3. **Output:** Server broadcasts global state to all clients every 100ms
+4. **Reconciliation:** Clients must interpolate positions to maintain 60 FPS visual smoothness
+
+---
+
+## 4. Supabase Integration Rules
+
+- **Auth:** Use `supabase.auth.getUser()` for session validation
+- **Realtime:** Use Postgres Changes for lobby updates and Room presence
+- **Security:** Every table MUST have Row Level Security (RLS) enabled
+
+---
+
+## 5. Phaser 3 Game Loop Directives
+
+- `preload()`: Load all tilesets, character spritesheets, and audio assets
+- `create()`: Initialize Tilemap, Physics groups, and Socket listeners
+- `update()`: Handle local input polling and update proximity-based volume levels
+
+---
+
+## 6. Testing Patterns
+
+- **Unit Tests:** Use Vitest for pure math and logic (distance, collision logic)
+- **DB Tests:** Use `supabase test db` for pgTAP RLS policy verification
+- **Integration:** Use Vitest Browser Mode or Playwright for WebRTC connection flows
+
+---
+
+## Why This is Vital
+
+**Version Correctness:** The AI won't try to use Phaser 2 or Socket.io v2 functions, which are incompatible.
+
+**Math Precision:** By defining the distance formula and attenuation model, the AI generates functional spatial audio code from the first attempt, without needing corrections to "panning" or volume.
+
+**Security:** The RLS reminder in the file prevents the AI from generating "open" database tables by default on Supabase.
