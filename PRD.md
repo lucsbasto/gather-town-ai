@@ -1,61 +1,64 @@
-# Product Requirements Document (PRD): Gather AI Clone
+# Product Requirements Document (PRD): Gather AI Clone (Supabase Edition)
 
 ## 1. Executive Summary
 
-Gather AI Clone is a 2D virtual space platform designed to solve "Zoom fatigue" by introducing spatial presence. Users interact through avatars in a gamified environment where audio and video are governed by the physical proximity of their characters, enabling spontaneous and organic "water cooler" conversations.
+The Gather AI Clone is a 2D spatial collaboration platform designed to eliminate "Zoom fatigue" by introducing spatial presence. Users interact through avatars in a gamified environment where audio and video are governed by the physical proximity of their characters, enabling spontaneous and organic interactions.
 
 ---
 
-## 2. Problem Statement
+## 2. Goals & Objectives
 
-Traditional video conferencing is static, scheduled, and transactional. Remote teams lack the serendipity of office-side chats, leading to social isolation and reduced team cohesion.
+**MVP Goal:** Deliver a functional 2D world where up to 20 concurrent users can move and talk via proximity-based WebRTC.
+
+**Infrastructure Strategy:** Utilize Supabase for authentication and real-time room state to minimize custom backend development and maximize AI-driven delivery.
+
+**Accessibility:** Ensure a seamless browser-based experience with zero installation requirements.
 
 ---
 
-## 3. Goals & Objectives
+## 3. Technology Stack
 
-**MVP Goal:** Create a stable, browser-based 2D world where up to 20 users can move and talk via proximity-based WebRTC.
-
-**Accessibility:** Support low-spec hardware and standard browsers without requiring software installation.
-
-**Speed-to-Market:** Leverage Generative AI (Gen-AI) for 80% of asset creation and code architecture.
+- **Frontend Engine:** Phaser 3 (Rendering, Input, and World Logic)
+- **Real-time & DB:** Supabase (Postgres Realtime for player coordinates, Auth for user management)
+- **Media SFU:** LiveKit (Spatial audio and video stream management)
+- **Environment:** Node.js v16.20.0 and Yarn v3.2.4
 
 ---
 
 ## 4. Functional Requirements (MVP)
 
-| Feature | Priority | Description |
-|---------|----------|-------------|
-| Grid Movement | P0 | 32x32 pixel-based navigation using keyboard (WASD/Arrows). |
-| Proximity A/V | P0 | Automatic video/audio connection when avatars are within 200px. |
-| Private Zones | P0 | Defined map areas where audio is restricted to the group inside. |
-| Ghost Mode | P1 | Hold 'G' to pass through other players and ignore collisions. |
-| Interactive Objects | P1 | Press 'X' to open external links, YouTube videos, or whiteboards. |
-| Global Chat | P2 | Text-based chat system for users in the same room. |
+| Feature | Description | Technical Implementation |
+|---------|-------------|------------------------|
+| Grid Movement | 32x32 pixel movement using WASD/Arrows | Phaser Arcade Physics + Grid snapping |
+| Real-time Sync | Player positions visible to all other users | Supabase Realtime (broadcast/presence) |
+| Proximity A/V | Audio/Video opens automatically when $d < 200$ pixels | Euclidean distance check via Phaser |
+| Private Zones | Group audio restricted to players on specific tiles | Tiled map properties (private_id) |
+| Interactive Objects | Press 'X' to open links or embedded iframes | Phaser collision detection + HUD modals |
 
 ---
 
-## 5. Non-Functional Requirements
+## 5. Movement and Spatial Logic
 
-- **Latency:** Movement synchronization latency must stay below 100ms to avoid jitter.
-- **Stability:** Support at least 20 concurrent users per room without audio degradation.
-- **Security:** Use Doppler for secrets and ensure all WebRTC traffic is encrypted via SFU (LiveKit).
-- **Compatibility:** Support Node.js version 16.20.0 and standard modern browsers.
+**Distance Calculation:** The proximity for triggering media streams is calculated using the Euclidean formula:
 
----
+$$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$
 
-## 6. AI Development Strategy
+**Audio Attenuation:** Sound volume must decrease logaritmically as distance increases to simulate real-world physics.
 
-This project adopts an AI-native workflow to maximize productivity:
-
-- **Code Generation:** Use Cursor (Agent Mode) or Claude Code to compile specifications in Design.md and Architecture.md into functional TypeScript.
-- **Asset Generation:** Use Stable Diffusion (with Tiled VAE or Non-Manifold Diffusion techniques) to generate seamless 2D tilesets and character sprite sheets.
-- **Procedural Maps:** Instruct LLMs to generate valid Tiled JSON map files to iterate on level design quickly.
+**Validation:** Movements are validated against a collision layer defined in the Tiled JSON map file.
 
 ---
 
-## 7. Success Metrics (KPIs)
+## 6. AI-First Development Plan
 
-- **Connection Speed:** Audio/Video should initialize in less than 2 seconds after proximity is reached.
-- **Uptime:** 99.9% availability for the media server (LiveKit).
-- **Performance:** Maintain 60 FPS on the client side during active movement.
+- **Code Generation:** Instruct the AI (Cursor/Claude) to build the Supabase connection layer and Phaser Scene structure based on @Architecture.md.
+- **Asset Generation:** Use Stable Diffusion with tiling extensions to generate the 32x32px textures and character spritesheets.
+- **Map Synthesis:** Generate valid JSON map files via LLM for the Tiled Editor schema to iterate on office layouts quickly.
+
+---
+
+## 7. Non-Functional Requirements
+
+- **Performance:** Maintain a consistent 60 FPS on the client side.
+- **Latency:** Synchronization latency must stay below 100ms for player movement.
+- **Scalability:** The Supabase + LiveKit architecture should support at least 20 users per room without performance degradation.
