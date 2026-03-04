@@ -2,10 +2,14 @@
 
 ## 1. Branching & Git Flow
 
-- **Main Branch:** The main branch is for production-ready code only. It is protected and requires a PR to merge.
+- **Main Branch:** The main branch is PROTECTED. NEVER commit directly to main.
 - **Feature Branches:** Develop new features in branches named `feat/feature-name`.
 - **Bug Fixes:** Use `fix/issue-name` for bug-related branches.
-- **Merge Policy:** All merges to main must go through a Pull Request (PR) with at least one manual review (or AI-driven check).
+- **Documentation:** Use `docs/doc-name` for documentation.
+- **Merge Policy:** ALL changes must go through a Pull Request (PR). NO exceptions.
+
+**🚫 NEVER do: git push origin main**
+**✅ ALWAYS do: git push origin feat/my-feature → Create PR**
 
 ---
 
@@ -23,6 +27,25 @@ We use the Conventional Commits format to ensure a readable project history:
 **Example:** `feat(game): add proximity-based video activation logic`
 
 ---
+
+## 3. Before ANY Commit (ALWAYS CHECK)
+
+### Step 1: Check .gitignore
+**ALWAYS verify** that you're not committing:
+- node_modules/
+- .env files
+- dist/
+- logs/
+- .cache/
+
+Run: `git status` and review every file.
+
+### Step 2: Use Skills
+Before implementing anything, search for relevant skills:
+- Check awesome-claude-skills and antigravity-awesome-skills repos
+- Use interface-design for UI
+- Use test-driven-development for tests
+- Use supabase for database
 
 ## 3. Pull Request (PR) Checklist
 
