@@ -23,6 +23,26 @@
 - **In Meeting** - Yellow, in a call
 - **Away** - Gray, inactive
 
+### 1.4 Avatar System (MVP - Phase 1)
+Users select a geometric shape and color to represent themselves.
+
+**Shapes:**
+- Circle
+- Square
+- Triangle
+- Diamond
+- Hexagon
+
+**Colors:**
+- Predefined palette of 12 colors
+- Hex values stored in database
+
+**Future (Phase 2):**
+- Full RPG character customization
+- Hair styles, glasses, hats
+- Shirts, pants, shoes
+- Multiple skin tones
+
 ---
 
 ## 2. Core Mechanics: Movement & Navigation
