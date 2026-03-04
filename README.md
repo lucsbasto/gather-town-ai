@@ -1,61 +1,59 @@
-Gather AI Clone - MVP
-1. Visão Geral
-Este projeto é um MVP de uma plataforma de interação espacial 2D, inspirado no Gather Town. O objetivo principal é permitir que avatares se movam em um mapa e ativem fluxos de áudio e vídeo automaticamente por proximidade.
+Gather AI Clone - MVP (Supabase Version)
+1. Project Overview
+The Gather AI Clone is a 2D spatial collaboration platform where users interact via avatars in a gamified map. The core value is spatial presence: audio and video streams are automatically activated based on proximity.
 
-2. Tecnologias Principais
-Motor de Jogo: Phaser 3 para renderização e física de grid.
+2. Core Tech Stack
+Game Engine: Phaser 3 for 2D rendering and grid-based movement.
 
-Comunicação: Socket.io para sincronização multijogador em tempo real.
+Backend & Database: Supabase (PostgreSQL) for Auth, Database, and Realtime player state.
 
-Mídia (SFU): LiveKit para streaming de áudio e vídeo espacial.
+Media Infrastructure (SFU): LiveKit for spatial audio and video streaming.
 
-Backend: Node.js (v16.20.0) e Express.
+Networking: Socket.io (for low-latency movement) + Supabase Realtime (for room state).
 
-Banco de Dados: CockroachDB com Prisma ORM.
+Language: TypeScript.
 
-3. Pré-requisitos
-Node.js: Versão exata 16.20.0. Recomendado usar nvm.
+3. Prerequisites
+Node.js: Version 16.20.0 (Recommended via nvm).
 
-Yarn: Versão 3.2.4, ativado via corepack.
+Yarn: Version 3.2.4.
 
-LiveKit Server: Instalado localmente para testes de vídeo.
+Supabase CLI: For local development and migrations.
 
-Doppler CLI: Para gerenciamento de segredos e variáveis de ambiente.
+LiveKit Server: Must be installed or accessible via LiveKit Cloud for video features.
 
-4. Estrutura de Pastas Sugerida
-/assets: Imagens, tilesets e áudios.
+4. Folder Structure
+/assets: Tilesets, character spritesheets, and UI assets.
 
-/src/scenes: Cenas do Phaser (Login, WaitingRoom, GameScene) .
+/src/scenes: Phaser scenes (Login, Lobby, WorldScene).
 
-/src/utils: Lógicas de colisão e cálculos de distância.
+/src/lib: Supabase client configuration and LiveKit hooks.
 
-/server: Lógica do servidor Node.js e Socket.io .
+/server: Lightweight Node.js server for Socket.io signaling.
 
-5. Configuração e Instalação
-Instale as dependências:
-
-Bash
+5. Quick Start
+**Clone and Install:**bash
 yarn install
-Configure as variáveis de ambiente (LiveKit):
+
+Environment Setup:
+Create a .env file with your credentials:
 
 Snippet de código
-LIVEKIT_API_KEY=<sua_key>
-LIVEKIT_API_SECRET=<seu_secret>
-LIVEKIT_WS_URL=wss://<seu-projeto>.livekit.cloud
-``` [10]
-Inicie o servidor de desenvolvimento:
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+LIVEKIT_API_KEY=your-livekit-key
+LIVEKIT_API_SECRET=your-livekit-secret
+Run Development:
 
 Bash
-yarn start
-``` [11]
+yarn dev
+6. AI Context Files
+To help your AI assistant build this faster, refer to these files in order:
 
-6. Contexto para IA (Prompting)
-Este repositório utiliza arquivos Markdown específicos para guiar assistentes de IA (como Cursor e Claude):
+PRD.md: Product requirements and feature priorities.
 
-Design.md: Regras de negócio e mecânicas de proximidade.
+Design.md: Movement and spatial audio logic.
 
-Architecture.md: Detalhes técnicos e fluxo de dados.
+Architecture.md: Data flow and Supabase/LiveKit integration.
 
-CLAUDE.md: Comandos de build e padrões de código.
-
-Confirme para eu enviar o próximo arquivo (Architecture.md).
+CLAUDE.md: Build commands and coding standards.
