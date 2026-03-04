@@ -46,8 +46,36 @@ Before implementing anything, search for relevant skills:
 - Use interface-design for UI
 - Use test-driven-development for tests
 - Use supabase for database
+- Use conventional-commits for commits
 
-## 3. Pull Request (PR) Checklist
+---
+
+## 4. Pull Request (PR) Workflow
+
+### Before Creating PR (ALWAYS)
+1. **Run local checks first:**
+   ```bash
+   yarn lint && yarn typecheck && yarn test && yarn build
+   ```
+
+2. **Create branch with proper name:**
+   - `feat/ticket-description`
+   - `fix/bug-description`
+   - `chore/task-description`
+
+3. **Push and Create PR via GitHub API**
+
+### PR Requirements
+- [ ] All local checks pass (lint, typecheck, test, build)
+- [ ] Tests written for new code (test-driven-development)
+- [ ] CI pipeline must pass
+- [ ] At least 1 approval required
+- [ ] No merge conflicts
+
+### NEVER Merge Without:
+- ✅ Tests passing
+- ✅ CI passing
+- ✅ Code reviewed
 
 Before any PR is approved, the following must be verified:
 
