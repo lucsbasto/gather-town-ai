@@ -1,5 +1,62 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-03-03T22:53:00Z",
-  "tasks": []
+  "lastUpdated": "2026-03-03T22:55:00Z",
+  "tasks": [
+    {
+      "id": "GT-001",
+      "title": "Set up Supabase project & migrations",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Create Supabase project and initial database schema"
+    },
+    {
+      "id": "GT-002",
+      "title": "Implement Auth integration",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Add Supabase Auth to frontend and backend"
+    },
+    {
+      "id": "GT-003",
+      "title": "Set up Socket.io server",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Create Socket.io server for real-time movement"
+    },
+    {
+      "id": "GT-004",
+      "title": "Implement player movement sync",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Sync player positions via Socket.io"
+    },
+    {
+      "id": "GT-005",
+      "title": "Add proximity detection",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Detect when players are within 200px"
+    },
+    {
+      "id": "GT-006",
+      "title": "Integrate LiveKit for spatial audio",
+      "status": "backlog",
+      "execution_role": "EXECUTOR",
+      "description": "Set up LiveKit for proximity-based audio"
+    },
+    {
+      "id": "GT-007",
+      "title": "Create map collision system",
+      "status": "backlog",
+      "execution_role": "DATA_ENGINEER",
+      "description": "Validate player movement against collision layer"
+    },
+    {
+      "id": "GT-008",
+      "title": "Review Supabase schema",
+      "status": "backlog",
+      "execution_role": "REVIEWER",
+      "description": "Review database schema and RLS policies"
+    }
+  ]
 }
